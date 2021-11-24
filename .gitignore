@@ -5,3 +5,4 @@ dags/__pycache__
 part-*
 *_SUCCESS*
 *.pyc
+docker/docker-airflow/spark_files/spark-2.4.5-bin-hadoop2.6/python/test_support/sql/orc_partitioned/b=1/c=1/part-r-00000-829af031-b970-49d6-ad39-30460a0be2c8.orc
