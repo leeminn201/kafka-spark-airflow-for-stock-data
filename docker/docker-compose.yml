@@ -2,18 +2,20 @@ version: "3.7"
 services:  
     # postgres used by airflow
     postgres:
-        image: postgres:9.6
+        image: postgres:13
         networks:
             - default_net
         volumes: 
             # Create Test database on Postgresql
-            - ./docker-airflow/pg-init-scripts:/docker-entrypoint-initdb.d
+            - ./docker-airflow/pg-init-scripts/create_table.sql:/docker-entrypoint-initdb.d/create_table.sql
         environment:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
             - POSTGRES_DB=airflow
         ports:
             - "5432:5432"
+
+
     pgadmin:
         image: dpage/pgadmin4
         networks:
