@@ -6,6 +6,7 @@ from modules import moduleExample
 # Create spark session
 spark = (SparkSession
     .builder
+    .master("local")
     .getOrCreate()
 )
 sc = spark.sparkContext
