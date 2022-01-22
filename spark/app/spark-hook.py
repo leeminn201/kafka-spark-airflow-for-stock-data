@@ -41,7 +41,7 @@ def _fetch_data(schema):
     df = spark.createDataFrame([],schema)
     for symbol in symbols:
         try:
-            temp = pd.DataFrame(yf.download(symbol, period='1y', interval='1d')).reset_index()
+            temp = pd.DataFrame(yf.download(symbol, period='1d', interval='1d')).reset_index()
             temp['Symbol'] = symbol
             temp = spark.createDataFrame(temp)
             df = df.union(temp)

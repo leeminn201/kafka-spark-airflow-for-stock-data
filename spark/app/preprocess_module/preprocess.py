@@ -1,5 +1,5 @@
 import uuid
-from pyspark.sql.functions import udf
+from pyspark.sql.functions import pandas_udf, PandasUDFType
 import pyspark.sql.functions as F
 from pyspark.sql.functions import to_timestamp
 import pandas as pd
@@ -18,6 +18,7 @@ def _rename_columns(df):
     
     return df
 
+
 def _exponential_smooth(key, df):
     """
     Function that exponentially smooths dataset so values are less 'rigid'
@@ -27,13 +28,14 @@ def _exponential_smooth(key, df):
         df: grouped by dataframe by "symbol"
     """
     symbol = df.Symbol.unique()[0]
-    symbol= key
+    #symbol= key
     df.set_index("Date",inplace=True)
     df = df.ewm(alpha=0.65).mean()
     df.reset_index(inplace=True)
     df.loc[:,'Symbol'] = symbol
     
     return pd.DataFrame(df.values)
+
 
 def _get_indicator_grouped_data(key, group):
     """
@@ -83,22 +85,22 @@ def _produce_prediction(key, group):
     pred_3 =  1 - ( group["close"] - group.shift(-3)["close"])/group["close"] 
     pred_3 = pred_3.iloc[:-3]
     pred_3 = pd.DataFrame(["down" if x < (1-p) else ("up" if x > (1+p) else "sw") for x in pred_3])
-    group['pred_'+str(3)] = pred_3
+    group.loc[:,'pred_3_5p'] = pred_3
     
     pred_5 =  1 - ( group["close"] - group.shift(-5)["close"])/group["close"] 
     pred_5 = pred_5.iloc[:-5]
     pred_5 = pd.DataFrame(["down" if x < (1-p) else ("up" if x > (1+p) else "sw") for x in pred_5])
-    group['pred_'+str(5)] = pred_5
+    group.loc[:,'pred_5_5p'] = pred_5
     
     pred_7 =  1 - ( group["close"] - group.shift(-7)["close"])/group["close"] 
     pred_7 = pred_7.iloc[:-7]
     pred_7 = pd.DataFrame(["down" if x < (1-p) else ("up" if x > (1+p) else "sw") for x in pred_7]) 
-    group['pred_'+str(7)] = pred_7
+    group.loc[:,'pred_7_5p'] = pred_7
     
     pred_10 =  1 - ( group["close"] - group.shift(-10)["close"])/group["close"] 
     pred_10 = pred_10.iloc[:-10]
     pred_10 = pd.DataFrame(["down" if x < (1-p) else ("up" if x > (1+p) else "sw") for x in pred_10])
-    group['pred_'+str(10)] = pred_10
+    group.loc[:,'pred_10_5p'] = pred_10
 
 
     group.dropna(inplace=True)
@@ -107,23 +109,21 @@ def _produce_prediction(key, group):
 
 
 def _fully_preprocess(df):
-    SCHEMA_EXP= "Date date, open double, high double, low double, close double, \
+    SCHEMA_EXP= "Date string, open double, high double, low double, close double, \
         Adj_close double, volume long, Symbol string"
     df_exp = df.groupBy("Symbol").applyInPandas(_exponential_smooth,schema=SCHEMA_EXP)
     
-    SCHEMA_IND = "Date date, close double, symbol string, 14_period_RSI double, \
+    SCHEMA_IND = "Date string, close double, symbol string, 14_period_RSI double, \
         14_period_STOCH_K double, MFV double, 14_period_ATR double, MOM double, 14_period_MFI double, \
             ROC double, OBV double, 20_period_CCI double, 14_period_EMV double, \
                 Williams double, 14_period_ADX double, 20_period_TRIX double"
     df_indi = df_exp.groupBy("Symbol").applyInPandas(_get_indicator_grouped_data,schema=SCHEMA_IND)
     
-    SCHEMA_PREDICTION = "Date date, close double, symbol string, 14_period_RSI double, \
+    SCHEMA_PREDICTION = "Date string, close double, symbol string, 14_period_RSI double, \
     14_period_STOCH_K double, MFV double, 14_period_ATR double, MOM double, 14_period_MFI double, \
     ROC double, OBV double, 20_period_CCI double, 14_period_EMV double, Williams double,\
-    14_period_ADX double, 20_period_TRIX double, pred_3 string, pred_5 string, pred_7 string, pred_10 string"
+    14_period_ADX double, 20_period_TRIX double, pred_3_5p string, pred_5_5p string, pred_7_5p string, pred_10_5p string"
     
     pp_df = df_indi.groupBy("Symbol").applyInPandas(_produce_prediction,schema=SCHEMA_PREDICTION)
     
     return pp_df
-
-

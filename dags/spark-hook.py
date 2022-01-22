@@ -24,7 +24,7 @@ default_args = {
     "depends_on_past": False,
     "start_date": datetime(now.year, now.month, now.day),
     "email": ["tranbinhluat@gmail.com"],
-    "email_on_failure": False,
+    "email_on_failure": True,
     "email_on_retry": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=1)
@@ -32,7 +32,7 @@ default_args = {
 
 dag = DAG(
     dag_id="test_hook",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date= datetime(now.year, now.month, now.day),
     schedule_interval="0 2 * * MON-FRI",
 )
 
