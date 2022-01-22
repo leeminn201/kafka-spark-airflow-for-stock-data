@@ -39,10 +39,14 @@ services:
         environment:
             - LOAD_EX=n
             - EXECUTOR=Local
+
         volumes:
             - ../dags:/usr/local/airflow/dags #DAG folder
             - ../spark/app:/usr/local/spark/app #Spark Scripts (Must be the same path in airflow and Spark Cluster)
             - ../spark/resources:/usr/local/spark/resources #Resources folder (Must be the same path in airflow and Spark Cluster)
+            - ../docker/docker-airflow/config/airflow.cfg:/usr/local/airflow/airflow/airflow.cfg
+
+
         ports:
             - "8282:8282"
         command: webserver

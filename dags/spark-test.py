@@ -19,8 +19,8 @@ default_args = {
     "owner": "airflow",
     "depends_on_past": False,
     "start_date": datetime(now.year, now.month, now.day),
-    "email": ["airflow@airflow.com"],
-    "email_on_failure": False,
+    "email": ["tranbinhluat@gmail.com"],
+    "email_on_failure": True,
     "email_on_retry": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=1)
@@ -30,7 +30,7 @@ dag = DAG(
         dag_id="spark-test", 
         description="This DAG runs a simple Pyspark app.",
         default_args=default_args, 
-        schedule_interval=timedelta(1)
+        schedule_interval=timedelta(minutes=30)
     )
 
 start = DummyOperator(task_id="start", dag=dag)
