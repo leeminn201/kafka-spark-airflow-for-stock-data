@@ -73,7 +73,9 @@ class StdoutListener():
 
         for key, row in data.iterrows():
             d = dict(row)
+            d['time'] = str(key) 
             self.producer.send(self.topic_name,d)
+            sleep(10)
 
 
     

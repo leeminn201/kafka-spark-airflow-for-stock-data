@@ -16,18 +16,18 @@ now = datetime.now()
 default_args = {
     "owner": "bigdatateam",
     "depends_on_past": False,
-    "start_date": datetime(2022, 1, 22, 10, 0),
+    "start_date": datetime(2022, 1, 21, 13, 50),
     "email": ["tranbinhluat@gmail.com"],
     "email_on_failure": True,
     "email_on_retry": False,
     "retries": 2,
-    "retry_delay": timedelta(days=1)
+    "retry_delay": timedelta(minutes=1)
 }
 
 
 dag = DAG(
     dag_id="produce_data",
-    start_date= datetime(2022, 1, 21, 10, 0),
+    start_date= datetime(2022, 1, 21, 13, 50),
     schedule_interval=timedelta(days=1),
 )
 

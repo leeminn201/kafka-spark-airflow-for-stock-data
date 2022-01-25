@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from datetime import datetime, timedelta
 from airflow.operators.email_operator import EmailOperator
+from airflow.contrib.sensors.file_sensor import FileSensor
 
 
 now = datetime.now()
@@ -33,7 +34,18 @@ email = EmailOperator(
         dag=dag
 )
 
+precheck = FileSensor(
+    task_id='check_for_datafile',
+    filepath='/usr/local/report/19012022.xlsx',
+    start_date=datetime(2022,1,21),
+    mode='reschedule',
+    dag=dag)
+
+
+
 end = DummyOperator(task_id="end", dag=dag)
 
 
-start >> email >> end
+start >> precheck >> email >> end
+
+

@@ -31,7 +31,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id="test_hook",
+    dag_id="spark_hook",
     start_date= datetime(now.year, now.month, now.day),
     schedule_interval="0 2 * * MON-FRI",
 )
