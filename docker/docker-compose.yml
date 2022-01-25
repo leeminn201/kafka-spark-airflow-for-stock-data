@@ -176,5 +176,16 @@ services:
           - ../spark/resources/data:/home/jovyan/work/data/
           - ../spark/resources/jars:/home/jovyan/work/jars/
 
+    # streamlit:
+    #     image: streamlit:latest
+    #     networks:
+    #         - default_net
+    #     ports:
+    #       - "8501:8501"
+    #     volumes:
+    #       - ../spark/src:/usr/src/app/src
+    #     # command: "streamlit run src/main.py"
+
+
 networks:
     default_net:
